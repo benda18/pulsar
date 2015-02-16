@@ -9,7 +9,7 @@ window.Pulsar = function (file) {
 window.Pulsar.prototype = {
   setRoute: function (route) {
     this.route = route;
-    this.direction = 0;
+    this.direction = 1;   //displays inbound routes by default on load.  
     this.fetchData();
   },
 
@@ -53,7 +53,8 @@ window.Pulsar.prototype = {
     var name = rd.route.route_short_name !== null ?
     rd.route.route_short_name :
     rd.route.route_long_name;
-    return name + " to " + rd.destination;
+    return name + " -- " + rd.destination;    //I'm reducing the number of times 'to' is used to minimize confusion between
+                                              //identifying the direction of travel and the destionation name of a route. 
   },
 
   redraw: function () {
@@ -70,9 +71,17 @@ window.Pulsar.prototype = {
       d3.select("#title").text('No transfers from this route and direction');
       return;
     }
-
+    
+    // Display the attributes of the From-Route as inbound or outbound rather than towards a particular stop. 
+    if (this.direction === 0) {		
+	  var ibob = "Outbound";			
+	  }								
+	  if (this.direction === 1) {		
+	  var ibob = "Inbound";			
+	  }
+    
     // set the title
-    d3.select("#title").text("Transfers from " + this.getname(this.data[0].fromRouteDirection));
+    d3.select("#title").text("Transfers from #" + this.route + " - " + ibob + " to...");  //simplifies how data is displayed. 
 
     // draw the new plot
     // figure the spacing
@@ -107,11 +116,17 @@ window.Pulsar.prototype = {
     transfers
       .append('text')
       .text(function (d) {
-        return instance.getname(d.toRouteDirection);
+        if (d.toRouteDirection.direction === "DIR_0") {	
+	      var ibob2 = "Outbound";							
+	      }													
+	      if (d.toRouteDirection.direction === "DIR_1") {	
+	      var ibob2 = "Inbound";							
+	      }	
+        return  d.toRouteDirection.route.route_short_name + " - " + ibob2 + " (" + d.fromStop.stop_name + ")";  //simplifies how data is displayed
       })
       .append('title')
       .text(function (d) {
-        return "at " + d.fromStop.stop_name;
+        //return "at " + d.fromStop.stop_name;    //preferred to turn off this hover element
       });
 
     var offset = -transfers[0][0].getBBox().height / 3;
