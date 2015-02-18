@@ -54,7 +54,7 @@ window.Pulsar.prototype = {
     rd.route.route_short_name :
     rd.route.route_long_name;
     return name + " -- " + rd.destination;    //I'm reducing the number of times 'to' is used to minimize confusion between
-                                              //identifying the direction of travel and the destionation name of a route. 
+                                              //identifying the direction of travel and the destination name of a route. 
   },
 
   redraw: function () {
