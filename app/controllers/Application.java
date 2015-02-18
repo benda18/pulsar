@@ -54,7 +54,8 @@ public class Application extends Controller {
         RouteDirection rd = new RouteDirection(r, Direction.fromGtfs(direction));
 
         // 100 meter threshold for transfers
-        Transfer[] xfers = t.getTransfers(rd, 400);
+        Transfer[] xfers = t.getTransfers(rd, 400);  	//$tim - this is the line where you can change the threshold distance for transfers (in meters)
+														//400 meters (default) = 1,312 feet = 0.25 miles
         
         List<Transfer> ret = new ArrayList<Transfer>();
         
