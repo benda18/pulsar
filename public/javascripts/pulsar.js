@@ -119,7 +119,7 @@ window.Pulsar.prototype = {
         if (d.toRouteDirection.direction === "DIR_0") {	
 	      var ibob2 = "Outbound";							
 	      }													
-	      if (d.toRouteDirection.direction === "DIR_1") {	
+	    if (d.toRouteDirection.direction === "DIR_1") {	
 	      var ibob2 = "Inbound";							
 	      }	
         return  d.toRouteDirection.route.route_short_name + " - " + ibob2 + " (" + d.fromStop.stop_name + ")";  //simplifies how data is displayed

@@ -621,7 +621,7 @@ public class TransferExtractor {
         /** actual transfer times */
         public TransferTime[] transferTimes; 
         
-        public Transfer(Stop fromStop, Stop toStop, RouteDirection fromRouteDirection, RouteDirection toRouteDirection) {
+        public Transfer(Stop fromStop, Stop toStop, RouteDirection fromRouteDirection, RouteDirection toRouteDirection) {	//$tim this is a good source
             this.fromStop = fromStop;
             this.toStop = toStop;
             this.fromRouteDirection = fromRouteDirection;
