@@ -34,7 +34,7 @@ The transit day queried by default is 2015-02-04.  Pulsar queries this date from
 than the more conventional calendar.txt.  Those familiar with the GTFS data specification may be confused by this as 
 calendar_dates.txt is an optional file and calendar.txt is required.  Furthermore, calendar_dates.txt is commonly used by 
 an agency to indicate irregular service dates and exceptions, such as running Sunday service on a holiday that falls on a 
-weekday.  
+weekday.  hello
 
 The code has been altered to show route direction as either "Outbound" or "Inbound" in index.html.  The issue herein is that 
 the GTFS feed for my preferred agency uses the value of '1' Inbound as and '0' as Outbound in the direction_id field in 
