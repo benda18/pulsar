@@ -26,7 +26,7 @@ The connections are filtered using the following rules:
 - Connections from Route A that occur before Route B is running are filtered (in practice, if 3 vehicles on route A arrive
   before the first vehicle arrives on route B, the first two vehicles on route A are ignored. This only applies at the
   start of the day; if service is split in two pieces (e.g. morning and afternoon rush), this filtering does not apply
-  to the second span.) hello
+  to the second span.) 
 
 ## Data Notes
 
