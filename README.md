@@ -27,3 +27,18 @@ The connections are filtered using the following rules:
   before the first vehicle arrives on route B, the first two vehicles on route A are ignored. This only applies at the
   start of the day; if service is split in two pieces (e.g. morning and afternoon rush), this filtering does not apply
   to the second span.)
+
+## Data Notes
+
+The transit day queried by default is 2015-02-04.  Pulsar queries this date from the GTFS feed via calendar_dates.txt rather 
+than the more conventional calendar.txt.  Those familiar with the GTFS data specification may be confused by this as 
+calendar_dates.txt is an optional file and calendar.txt is required.  Furthermore, calendar_dates.txt is commonly used by 
+an agency to indicate irregular service dates and exceptions, such as running Sunday service on a holiday that falls on a 
+weekday.  
+
+The code has been altered to show route direction as either "Outbound" or "Inbound" in index.html.  The issue herein is that 
+the GTFS feed for my preferred agency uses the value of '1' Inbound as and '0' as Outbound in the direction_id field in 
+trips.txt.  The issue for you as a user of a different feed is that while 0 and 1 as the only values permitted to be used
+here, there is no specification that requires 1 be inbound and 0 outbound - you will need to check your feed and adjust 
+the code as necessary in pulsar.js  Also, a flaw right now is it does not accurately descirbe looping routes or routes
+which are locally referred to by "eastbound vs westbound" etc.  
