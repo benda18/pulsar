@@ -93,7 +93,7 @@ window.Pulsar.prototype = {
     // 250 is for text
     var xscale = d3.scale.linear()
       .domain([0, 90])
-      .range([400, this.width - 10]);
+      .range([400, this.width - 10]);  //$tim - unrelated to threshold distance
 
     var svg = d3.select(".figure")
       .append('svg')
@@ -126,7 +126,10 @@ window.Pulsar.prototype = {
       })
       .append('title')
       .text(function (d) {
-        //return "at " + d.fromStop.stop_name;    //preferred to turn off this hover element
+		var vDist = d.distance * 0.000621371 * 100; //$tim new variable for transfer distance, converted from meters to miles
+		var vDist = Math.round(vDist);				//$tim math to get decimal precision correct. 
+		var vDist = vDist / 100; 					//$tim math to get decimal precision correct. 
+		return "deboard:\t\t" + d.fromStop.stop_name + " (" + d.fromStop.stop_id + ") \nboard:\t\t" + d.toStop.stop_name + " (" + d.toStop.stop_id + ")\ndistance:\t\t" + vDist + " miles";  //$tim re-wrote to give more info regarding off, on stops & distance between. 
       });
 
     var offset = -transfers[0][0].getBBox().height / 3;
@@ -157,7 +160,7 @@ window.Pulsar.prototype = {
     transferMarkers.enter()
       .append('circle')
       .attr('class', 'transfer-marker')
-      .attr('r', '3');
+      .attr('r', '3');		//$tim - control radius of the circle marker. 
 
     transferMarkers
       .attr('cy', offset)
