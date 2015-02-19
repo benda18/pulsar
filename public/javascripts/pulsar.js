@@ -157,14 +157,14 @@ window.Pulsar.prototype = {
 
         return filtered;
       });
-	
+	  
     transferMarkers.enter()
       .append('circle')
       .attr('class', 'transfer-marker')
       .attr('r', '5');		//$tim - control radius of the circle marker.
 
     transferMarkers
-      .attr('cy', offset)
+	  .attr('cy', offset)
       .attr('cx', function (d) {
         return xscale(d.lengthOfTransfer / 60);
       })
