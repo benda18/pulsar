@@ -53,7 +53,7 @@ window.Pulsar.prototype = {
     var name = rd.route.route_short_name !== null ?
     rd.route.route_short_name :
     rd.route.route_long_name;
-    return name + " -- " + rd.destination;    //I'm reducing the number of times 'to' is used to minimize confusion between
+    return name + " -- " + rd.destination;    //$tim I'm reducing the number of times 'to' is used to minimize confusion between
                                               //identifying the direction of travel and the destination name of a route. 
   },
 
@@ -92,7 +92,7 @@ window.Pulsar.prototype = {
 
     // 250 is for text
     var xscale = d3.scale.linear()
-      .domain([0, 90])
+      .domain([-5, 85])				//$tim [0, 90]
       .range([400, this.width - 10]);  //$tim - unrelated to threshold distance
 
     var svg = d3.select(".figure")
@@ -122,7 +122,8 @@ window.Pulsar.prototype = {
 	    if (d.toRouteDirection.direction === "DIR_1") {	
 	      var ibob2 = "Inbound";							
 	      }	
-        return  d.toRouteDirection.route.route_short_name + " - " + ibob2 + " (" + d.fromStop.stop_name + ")";  //simplifies how data is displayed
+        return  d.toRouteDirection.route.route_short_name + " - " + ibob2 + " (" + d.fromStop.stop_name + ")";  //$tim simplifies how data is displayed
+		
       })
       .append('title')
       .text(function (d) {
@@ -136,8 +137,8 @@ window.Pulsar.prototype = {
 
     // add a line from each transfer so you can follow it across
     transfers.append('line')
-      .attr('x1', xscale(0))
-      .attr('x2', xscale(90))
+      .attr('x1', xscale(-5))	//$tim 0
+      .attr('x2', xscale(85))	//$tim 90
       .attr('y1', offset)
       .attr('y2', offset)
       .attr('class', 'transfer-line');
@@ -156,11 +157,11 @@ window.Pulsar.prototype = {
 
         return filtered;
       });
-
+	
     transferMarkers.enter()
       .append('circle')
       .attr('class', 'transfer-marker')
-      .attr('r', '3');		//$tim - control radius of the circle marker. 
+      .attr('r', '5');		//$tim - control radius of the circle marker.
 
     transferMarkers
       .attr('cy', offset)
