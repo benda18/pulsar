@@ -50,10 +50,10 @@ public class TransferExtractor {
     private final static Logger LOG = Logger.getLogger(TransferExtractor.class.getName());
     
     /** The minimum transfer time */
-    private static final int minTransferTime = 2 * 60;
+    private static final int minTransferTime = -5 * 60;  //$tim 2 is default
     
     /** the maximum transfer time before it is considered not a transfer. 90 minutes of waiting is pretty ridiculous */
-    private static final int maxTransferTime = 60 * 90;
+    private static final int maxTransferTime = 60 * 85;	//$tim 90 is default
     
     /** how fast can we walk, in m/s? This is set slightly less than in OTP because we are using as-the-crow-flies distance */
     private static final double walkSpeed = 1;
@@ -166,7 +166,8 @@ public class TransferExtractor {
                 continue;
             
             // TODO: don't assume GTFS has a direction ID
-            Direction dir = Direction.fromGtfs(trip.direction_id); 
+			
+            Direction dir = Direction.fromGtfs(trip.direction_id);  //$tim$ default = trip.direction_id
             
             RouteDirection rd = new RouteDirection(trip.route, dir);
             
@@ -181,9 +182,9 @@ public class TransferExtractor {
         routesByStop = HashMultimap.create();
         
         for (Trip trip : feed.trips.values()) {
-            RouteDirection routeDir = new RouteDirection(trip.route, Direction.fromGtfs(trip.direction_id));
+            RouteDirection routeDir = new RouteDirection(trip.route, Direction.fromGtfs(trip.direction_id));	//$tim$ default = trip.direction_id
             
-            Collection<StopTime> stopTimes = stopTimesForTrip(trip.trip_id);
+            Collection<StopTime> stopTimes = stopTimesForTrip(trip.trip_id); //$tim trip_id
             
             for (StopTime st : stopTimes) {
                 routesByStop.put(feed.stops.get(st.stop_id), routeDir);
