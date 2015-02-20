@@ -92,7 +92,7 @@ window.Pulsar.prototype = {
 
     // 250 is for text
     var xscale = d3.scale.linear()
-      .domain([-5, 85])				//$tim [0, 90]
+      .domain([-10, 80])				//$tim [0, 90] - this scales the entire chart, not just the circles
       .range([400, this.width - 10]);  //$tim - unrelated to threshold distance
 
     var svg = d3.select(".figure")
@@ -102,17 +102,28 @@ window.Pulsar.prototype = {
       .append('g');
 
     // append each transfer
-    var transfers = svg.selectAll('g.transfer')
+    var transfers = svg.selectAll('g.transfer')	//$tim changing this does nothing
       .data(this.data);
+	  
+	var transfers3 = svg.selectAll('g.transfer')		//$tim33
+      .data(this.data);									//$tim33  
 
-    transfers
+    transfers		//$tim this is the actual transfer svg plot ##########################
       .enter()
       .append('g')
-      .attr('class', 'transfer')
+      .attr('class', 'transfer2')	//$tim&& if i change this to 'transfer99' only the colour of plots changes and lines disappear
       .attr('transform', function (d, i) {
         return 'translate(0 ' + yscale(i + 1) + ')';
       });
 
+	transfers3											//$tim33
+      .enter()											//$tim33
+      .append('g')										//$tim33
+      .attr('class', 'transfer3')						//$tim33
+      .attr('transform', function (d3, i) {				//$tim33
+        return 'translate(0 ' + yscale(i + 1) + ')';	//$tim33
+      });												//$tim33
+	  
     transfers
       .append('text')
       .text(function (d) {
@@ -134,11 +145,12 @@ window.Pulsar.prototype = {
       });
 
     var offset = -transfers[0][0].getBBox().height / 3;
+	var offset3 = -transfers3[0][0].getBBox().height / 3;	//$tim33
 
     // add a line from each transfer so you can follow it across
     transfers.append('line')
-      .attr('x1', xscale(-5))	//$tim 0
-      .attr('x2', xscale(85))	//$tim 90
+      .attr('x1', xscale(-10))	//$tim 0
+      .attr('x2', xscale(80))	//$tim 90, this is the horizontal line
       .attr('y1', offset)
       .attr('y2', offset)
       .attr('class', 'transfer-line');
@@ -157,6 +169,21 @@ window.Pulsar.prototype = {
 
         return filtered;
       });
+
+    var transferMarkers3 = transfers3.selectAll('circle')												//$tim33
+      .data(function (d3, i) {																			//$tim33
+        // TODO: filter here																			//$tim33
+        var filtered = [];																				//$tim33
+																										//$tim33
+        d3.transferTimes.forEach(function (tt3) {														//$tim33
+          if (tt3.timeOfDay >= instance.range[0] * 3600 && tt3.timeOfDay <= instance.range[1] * 3600) {	//$tim33
+            filtered.push(tt3);																			//$tim33
+          }																								//$tim33
+        });																								//$tim33
+																										//$tim33
+        return filtered;																				//$tim33
+      });																								//$tim33
+
 	  
     transferMarkers.enter()
       .append('circle')
@@ -173,6 +200,21 @@ window.Pulsar.prototype = {
         return Math.round(d.lengthOfTransfer / 60) + ' minute transfer at ' + instance.formatTime(d.timeOfDay / 3600);
       });
 
+	transferMarkers3.enter()																							//$tim33
+      .append('circle')																									//$tim33
+      .attr('class', 'transfer-marker')																					//$tim33 may need to update to transfer3-marker
+      .attr('r', '3');																									//$tim33
+																														//$tim33
+    transferMarkers3																									//$tim33
+	  .attr('cy', offset)																								//$tim33
+      .attr('cx', function (d3) {																						//$tim33
+        return xscale(d3.lengthOfTransfer / 60);																		//$tim33
+      })																												//$tim33
+      .append('title')																									//$tim33
+      .text(function (d3) {																								//$tim33
+        return Math.round(d3.lengthOfTransfer / 60) + ' minute transfer at ' + instance.formatTime(d3.timeOfDay / 3600);//$tim33
+      });																												//$tim33
+	 
       // set up the axis
       var axis = d3.svg.axis()
         .scale(xscale)
