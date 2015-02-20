@@ -1,5 +1,6 @@
 svg text, body { font-family: "Helvetica Neue", sans }
 body { padding: 8px }
-.transfer line { stroke-width: 0.2; stroke: #999 }
-.transfer circle { fill: red } 
+.transfer2 line { stroke-width: 0.2; stroke: #999 }
+.transfer3 circle { fill: #888 } 
+.transfer2 circle { fill: red } 
 .legend path { fill-opacity: 0 }
