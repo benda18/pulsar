@@ -11,8 +11,14 @@ import com.conveyal.gtfs.model.Stop;
 import com.conveyal.pulsar.TransferExtractor;
 import com.conveyal.pulsar.TransferExtractor.Direction;
 import com.conveyal.pulsar.TransferExtractor.RouteDirection;
-import com.conveyal.pulsar.TransferExtractor.Transfer;
+import com.conveyal.pulsar.TransferExtractor.Transfer2;		//$tim&& should be .Transfer
 import com.conveyal.pulsar.TransferExtractor.TransferTime;
+
+import com.conveyal.pulsar.TransferExtractor3;					//$tim33
+import com.conveyal.pulsar.TransferExtractor3.Direction3;		//$tim33
+import com.conveyal.pulsar.TransferExtractor3.RouteDirection3;	//$tim33
+import com.conveyal.pulsar.TransferExtractor3.Transfer3;		//$tim33
+import com.conveyal.pulsar.TransferExtractor3.TransferTime3;	//$tim33
 
 import play.*;
 import play.libs.Json;
@@ -54,15 +60,15 @@ public class Application extends Controller {
         RouteDirection rd = new RouteDirection(r, Direction.fromGtfs(direction));
 
         // 100 meter threshold for transfers
-        Transfer[] xfers = t.getTransfers(rd, 400);  	//$tim - this is the line where you can change the threshold distance for transfers (in meters)
+        Transfer2[] xfers = t.getTransfers(rd, 400);  	//$tim$$ should be Transfer[ - this is the line where you can change the threshold distance for transfers (in meters)
 														//400 meters (default) = 1,312 feet = 0.25 miles
         
-        List<Transfer> ret = new ArrayList<Transfer>();
+        List<Transfer2> ret = new ArrayList<Transfer2>();  //$tim$$ should be <Transfer> <Transfer>
         
         Stop[] fromStops = t.stopsForRouteDirection(rd);
         String destName = fromStops[fromStops.length - 1].stop_name;
         
-        for (Transfer xfer : xfers) {
+        for (Transfer2 xfer : xfers) {  //$tim$$ should be (Transfer
             xfer.transferTimes = t.transferTimes(xfer);
             if (xfer.transferTimes.length > 0)
                 ret.add(xfer);
