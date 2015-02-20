@@ -50,10 +50,10 @@ public class TransferExtractor {
     private final static Logger LOG = Logger.getLogger(TransferExtractor.class.getName());
     
     /** The minimum transfer time */
-    private static final int minTransferTime = -5 * 60;  //$tim 2 is default
+    private static final int minTransferTime = -10 * 60;  //$tim 2 is default
     
     /** the maximum transfer time before it is considered not a transfer. 90 minutes of waiting is pretty ridiculous */
-    private static final int maxTransferTime = 60 * 85;	//$tim 90 is default
+    private static final int maxTransferTime = 60 * 2;	//$tim 90 is default
     
     /** how fast can we walk, in m/s? This is set slightly less than in OTP because we are using as-the-crow-flies distance */
     private static final double walkSpeed = 1;
@@ -76,11 +76,11 @@ public class TransferExtractor {
         GTFSFeed feed = GTFSFeed.fromFile(args[0]);
         LOG.info("feed loaded");
         
-        TransferExtractor t = new TransferExtractor(feed);        
-        RouteDirection rd = new RouteDirection(feed.routes.get(args[1]), Direction.fromGtfs(Integer.parseInt(args[2])));
-        
+        TransferExtractor t2 = new TransferExtractor(feed);  //$tim&&      
+		RouteDirection rd = new RouteDirection(feed.routes.get(args[1]), Direction.fromGtfs(Integer.parseInt(args[2])));
+				
         LOG.info("finding transfers");        
-        Transfer[] transfers = t.getTransfers(rd, 100);
+        Transfer2[] transfers = t2.getTransfers(rd, 100);	//$tim&& should be Transfer[]
         
         LOG.info("found transfers to " + transfers.length + " route directions");
         
@@ -90,11 +90,11 @@ public class TransferExtractor {
         
         outfile.write("route_id,direction_id,destination,at,min,percentile_25,median,percentile_75,max,count\n");
         
-        for (Transfer xfer : transfers) {
+        for (Transfer2 xfer : transfers) {	//$tim&& should be (Transfer
             if (++i % 50 == 0)
                 LOG.info("processed " + (i - 1) + " transfers");
 
-            t.addDistributionToTransfer(xfer, 7 * 60 * 60, 9 * 60 * 60);
+            t2.addDistributionToTransfer(xfer, 7 * 60 * 60, 9 * 60 * 60);
             
             if (xfer.median == Integer.MIN_VALUE)
                 // no transfers to this route.
@@ -103,7 +103,7 @@ public class TransferExtractor {
             // TODO: quoting
             outfile.write(xfer.toRouteDirection.route.route_id + ",");
             outfile.write(xfer.toRouteDirection.direction.toGtfs() + ",");
-            outfile.write("\"" + t.getName(xfer.toRouteDirection) + "\",");
+            outfile.write("\"" + t2.getName(xfer.toRouteDirection) + "\",");
             outfile.write("\"" + xfer.fromStop.stop_name + "\",");
             outfile.write(xfer.min + ",");
             outfile.write(xfer.pct25 + ",");
@@ -168,7 +168,7 @@ public class TransferExtractor {
             // TODO: don't assume GTFS has a direction ID
 			
             Direction dir = Direction.fromGtfs(trip.direction_id);  //$tim$ default = trip.direction_id
-            
+			
             RouteDirection rd = new RouteDirection(trip.route, dir);
             
             tripIndex.put(rd, trip);
@@ -183,7 +183,7 @@ public class TransferExtractor {
         
         for (Trip trip : feed.trips.values()) {
             RouteDirection routeDir = new RouteDirection(trip.route, Direction.fromGtfs(trip.direction_id));	//$tim$ default = trip.direction_id
-            
+			
             Collection<StopTime> stopTimes = stopTimesForTrip(trip.trip_id); //$tim trip_id
             
             for (StopTime st : stopTimes) {
@@ -322,19 +322,19 @@ public class TransferExtractor {
      * Get the optimal transfers for a route direction, in order from their transfer stops.
      * @param threshold maximum transfer distance, meters as the crow flies.
      */
-    public Transfer[] getTransfers(RouteDirection dir, double threshold) {
+    public Transfer2[] getTransfers(RouteDirection dir, double threshold) {  //$tim&& should be Transfer[]
         
         // get all of the stops for the route direction
         Stop[] stops = stopsForRouteDirection(dir);
         
-        ArrayList<Transfer> transfers = new ArrayList<Transfer>();
-        Multimap<Stop, Transfer> transfersByStop = HashMultimap.create();
+        ArrayList<Transfer2> transfers = new ArrayList<Transfer2>();  //$tim&& should be <Transfer> <Transfer>
+        Multimap<Stop, Transfer2> transfersByStop = HashMultimap.create();  //$tim&& should be Transfer>
         
         int i = 0;
         for (Stop fromStop : stops) {
             // loop over stops near this stop
             // TODO: don't hardwire threshold to 100m
-            Map<RouteDirection, Transfer> bestTransfersForThisStop = new HashMap<RouteDirection, Transfer>();
+            Map<RouteDirection, Transfer2> bestTransfersForThisStop = new HashMap<RouteDirection, Transfer2>(); //$tim&& should be Transfer> Transfer>
             
             for (Stop toStop : stopsNear(fromStop.stop_lat, fromStop.stop_lon, threshold)) {
                 // find all possible transfers
@@ -347,20 +347,20 @@ public class TransferExtractor {
                     if (rd.route.equals(dir.route))
                         continue;
                     
-                    Transfer t = new Transfer(fromStop, toStop, dir, rd);
+                    Transfer2 t2 = new Transfer2(fromStop, toStop, dir, rd); //$tim&& should be Transfer t, Transfer(
                     
                     // find one best transfer to every other route direction
-                    if (bestTransfersForThisStop.containsKey(rd) && bestTransfersForThisStop.get(rd).distance < t.distance)
+                    if (bestTransfersForThisStop.containsKey(rd) && bestTransfersForThisStop.get(rd).distance < t2.distance)
                         continue;
                     
-                    bestTransfersForThisStop.put(rd, t);
+                    bestTransfersForThisStop.put(rd, t2);
                 }
             }
             
             // add the best transfers to the indices
-            for (Transfer t : bestTransfersForThisStop.values()) {
-                transfers.add(t);
-                transfersByStop.put(fromStop, t);
+            for (Transfer2 t2 : bestTransfersForThisStop.values()) {  //$tim&& should be (Transfer t
+                transfers.add(t2);
+                transfersByStop.put(fromStop, t2);
             }
             
             i++;
@@ -368,38 +368,38 @@ public class TransferExtractor {
         
         // filter the transfers so that when there is a common trunk, we only have the first and last transfers
         for (int sidx = 1; sidx < stops.length - 1; sidx++) {
-            Set<Transfer> transfersToRemove = new HashSet<Transfer>();
+            Set<Transfer2> transfersToRemove = new HashSet<Transfer2>();  //$tim&& should be <Transfer> <Transfer>
             
             // we are in a block of continuous transfers
             if (transfersByStop.containsKey(stops[sidx]) &
                     transfersByStop.containsKey(stops[sidx - 1]) &&
                     transfersByStop.containsKey(stops[sidx + 1])) {
-                for (Transfer t : transfersByStop.get(stops[sidx])) {
+                for (Transfer2 t2 : transfersByStop.get(stops[sidx])) {  //$tim&& should be (Transfer t
                     boolean previous = false;
                     boolean next = false;
                     
-                    for (Transfer prevt : transfersByStop.get(stops[sidx - 1])) {
-                        if (prevt.toRouteDirection.equals(t.toRouteDirection)) {
+                    for (Transfer2 prevt : transfersByStop.get(stops[sidx - 1])) {  //$tim&& should be (Transfer
+                        if (prevt.toRouteDirection.equals(t2.toRouteDirection)) {
                             previous = true;
                             break;
                         }
                     }
                     
-                    for (Transfer nextt : transfersByStop.get(stops[sidx - 1])) {
-                        if (nextt.toRouteDirection.equals(t.toRouteDirection)) {
+                    for (Transfer2 nextt : transfersByStop.get(stops[sidx - 1])) {  //$tim&& should be (Transfer
+                        if (nextt.toRouteDirection.equals(t2.toRouteDirection)) {
                             next = true;
                             break;
                         }
                     }
                     
-                    transfersToRemove.add(t);
+                    transfersToRemove.add(t2);
                 }
             }
             
             transfers.removeAll(transfersToRemove);
         }        
         
-        return transfers.toArray(new Transfer[transfers.size()]);
+        return transfers.toArray(new Transfer2[transfers.size()]);  //$tim&& should be Transfer[
     }
     
     /**
@@ -408,13 +408,13 @@ public class TransferExtractor {
      * which is fine for the the TriMet use case as we use this in conjunction with calendar_extract. but in general this is not
      * desirable.
      */
-    public TransferTime[] transferTimes(Transfer t) {
+    public TransferTime[] transferTimes(Transfer2 t2) {  //$tim&& should be (Transfer t)
         // we can't just use an array, as not every trip stops at every stop
         // note
         TIntList arrivalTimes = new TIntArrayList(); 
         TIntList departureTimes = new TIntArrayList();
         
-        for (Trip trip : tripIndex.get(t.fromRouteDirection)) {
+        for (Trip trip : tripIndex.get(t2.fromRouteDirection)) {
             Iterator<StopTime> stopTimes = stopTimesForTrip(trip.trip_id).iterator();
             
             // doesn't make sense to transfer from the first stop on a trip, advance the iterator one
@@ -429,18 +429,18 @@ public class TransferExtractor {
             
             while (stopTimes.hasNext()) {
                 StopTime st = stopTimes.next();
-                if (st.stop_id.equals(t.fromStop.stop_id)) {
+                if (st.stop_id.equals(t2.fromStop.stop_id)) {
                     arrivalTimes.add(st.arrival_time);
                 }
             }
         }
         
-        for (Trip trip : tripIndex.get(t.toRouteDirection)) {
+        for (Trip trip : tripIndex.get(t2.toRouteDirection)) {
             Iterator<StopTime> stopTimes = stopTimesForTrip(trip.trip_id).iterator();
             while (stopTimes.hasNext()) {
                 StopTime st = stopTimes.next();
                 // doesn't make sense to transfer to the last stop on a trip, so if that's the case skip this one.
-                if (st.stop_id.equals(t.toStop.stop_id) && stopTimes.hasNext()) {
+                if (st.stop_id.equals(t2.toStop.stop_id) && stopTimes.hasNext()) {
                     departureTimes.add(st.departure_time);
                 }
             }
@@ -475,7 +475,7 @@ public class TransferExtractor {
         ARRIVALS: while (arrivalsIterator.hasNext()) {
             int arrival = arrivalsIterator.next();
             
-            int earliestPossibleDeparture = arrival + minTransferTime + (int) Math.round(t.distance / walkSpeed);
+            int earliestPossibleDeparture = arrival + minTransferTime + (int) Math.round(t2.distance / walkSpeed);
             
             while (departure < earliestPossibleDeparture) {
                 if (!departuresIterator.hasNext())
@@ -500,8 +500,8 @@ public class TransferExtractor {
      * @param fromTime the beginning of the time window to consider, in seconds
      * @param toTome the end of the time window to consider, in seconds
      */
-    public void addDistributionToTransfer(Transfer t, int fromTime, int toTime) {
-        TransferTime[] times = transferTimes(t);
+    public void addDistributionToTransfer(Transfer2 t2, int fromTime, int toTime) {  //$tim&& should be (Transfer t,
+        TransferTime[] times = transferTimes(t2);
         
         Arrays.sort(times, new TransferTime.LengthComparator());
         
@@ -509,15 +509,15 @@ public class TransferExtractor {
             return;
         
         // min and max are easy
-        t.min = times[0].lengthOfTransfer;
-        t.max = times[times.length - 1].lengthOfTransfer;
+        t2.min = times[0].lengthOfTransfer;
+        t2.max = times[times.length - 1].lengthOfTransfer;
         
         // get the percentiles
-        t.pct25 = getPercentile(25, times);
-        t.median = getPercentile(50, times);
-        t.pct75 = getPercentile(75, times);
+        t2.pct25 = getPercentile(25, times);
+        t2.median = getPercentile(50, times);
+        t2.pct75 = getPercentile(75, times);
         
-        t.n = times.length;
+        t2.n = times.length;
     }
     
     
@@ -592,7 +592,7 @@ public class TransferExtractor {
      * @author mattwigway
      *
      */
-    public static class Transfer {
+    public static class Transfer2 {  //$tim&& should be Transfer
         public Stop fromStop;
         public Stop toStop;
         public RouteDirection fromRouteDirection;
@@ -622,7 +622,7 @@ public class TransferExtractor {
         /** actual transfer times */
         public TransferTime[] transferTimes; 
         
-        public Transfer(Stop fromStop, Stop toStop, RouteDirection fromRouteDirection, RouteDirection toRouteDirection) {	//$tim this is a good source
+        public Transfer2(Stop fromStop, Stop toStop, RouteDirection fromRouteDirection, RouteDirection toRouteDirection) {	//$tim&& this is a good source; should be Transfer
             this.fromStop = fromStop;
             this.toStop = toStop;
             this.fromRouteDirection = fromRouteDirection;
@@ -633,6 +633,7 @@ public class TransferExtractor {
             min = pct25 = median = pct75 = max = n = Integer.MIN_VALUE;
         }
     }
+
     
     /** Represents a single instance of a transfer, with the length and the time of day */
     public static class TransferTime {
@@ -664,3 +665,4 @@ public class TransferExtractor {
         }
     }
 }
+
