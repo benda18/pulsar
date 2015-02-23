@@ -50,10 +50,10 @@ public class TransferExtractor3 {
     private final static Logger LOG = Logger.getLogger(TransferExtractor3.class.getName());
     
     /** The minimum transfer time */
-    private static final int minTransferTime3 = -10 * 60;  //$tim 2 is default
+    private static final int minTransferTime3 = -5 * 60;  //$tim 2 is default
     
     /** the maximum transfer time before it is considered not a transfer. 90 minutes of waiting is pretty ridiculous */
-    private static final int maxTransferTime3 = 60 * 80;	//$tim 90 is default
+    private static final int maxTransferTime3 = 60 * 85;	//$tim 90 is default
     
     /** how fast can we walk, in m/s? This is set slightly less than in OTP because we are using as-the-crow-flies distance */
     private static final double walkSpeed3 = 1;
