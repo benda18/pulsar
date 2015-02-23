@@ -102,10 +102,10 @@ window.Pulsar.prototype = {
       .append('g');
 
     // append each transfer
-    var transfers = svg.selectAll('g.transfer')	//$tim changing this does nothing
+    var transfers = svg.selectAll('g.transfer2')	//$tim changing this does nothing
       .data(this.data);
 	  
-	var transfers3 = svg.selectAll('g.transfer')		//$tim33
+	var transfers3 = svg.selectAll('g.transfer3')		//$tim33
       .data(this.data);									//$tim33  
 
     transfers		//$tim this is the actual transfer svg plot ##########################
@@ -120,7 +120,7 @@ window.Pulsar.prototype = {
       .enter()											//$tim33
       .append('g')										//$tim33
       .attr('class', 'transfer3')						//$tim33
-      .attr('transform', function (d3, i) {				//$tim33
+      .attr('transform', function (d4, i) {				//$tim33x - should not be d3
         return 'translate(0 ' + yscale(i + 1) + ')';	//$tim33
       });												//$tim33
 	  
@@ -171,11 +171,11 @@ window.Pulsar.prototype = {
       });
 
     var transferMarkers3 = transfers3.selectAll('circle')												//$tim33
-      .data(function (d3, i) {																			//$tim33
+      .data(function (d4, i) {																			//$tim33
         // TODO: filter here																			//$tim33
         var filtered = [];																				//$tim33
 																										//$tim33
-        d3.transferTimes.forEach(function (tt3) {														//$tim33
+        d4.transferTimes.forEach(function (tt3) {														//$tim33 - something wrong here  d3.transferTimes3.
           if (tt3.timeOfDay >= instance.range[0] * 3600 && tt3.timeOfDay <= instance.range[1] * 3600) {	//$tim33
             filtered.push(tt3);																			//$tim33
           }																								//$tim33
@@ -193,26 +193,33 @@ window.Pulsar.prototype = {
     transferMarkers
 	  .attr('cy', offset)
       .attr('cx', function (d) {
+	if (Math.round(d.lengthOfTransfer / 60) <= 2) {	//$tim-z	  
         return xscale(d.lengthOfTransfer / 60);
+      }												//$tim-z		
       })
       .append('title')
-      .text(function (d) {
+	  .text(function (d) {
+	  //if (Math.round(d.lengthOfTransfer / 60) > -3) {													//$tim33x - this is groundbreaking
         return Math.round(d.lengthOfTransfer / 60) + ' minute transfer at ' + instance.formatTime(d.timeOfDay / 3600);
+	//}																									//$tim33x - this is groundbreaking
       });
 
 	transferMarkers3.enter()																							//$tim33
       .append('circle')																									//$tim33
-      .attr('class', 'transfer-marker')																					//$tim33 may need to update to transfer3-marker
-      .attr('r', '3');																									//$tim33
+      .attr('class', 'transfer-marker3')	//$tim33																					//$tim33 may need to update to transfer3-marker
+      .attr('r', '7');																									//$tim33
 																														//$tim33
     transferMarkers3																									//$tim33
 	  .attr('cy', offset)																								//$tim33
-      .attr('cx', function (d3) {																						//$tim33
-        return xscale(d3.lengthOfTransfer / 60);																		//$tim33
-      })																												//$tim33
-      .append('title')																									//$tim33
-      .text(function (d3) {																								//$tim33
-        return Math.round(d3.lengthOfTransfer / 60) + ' minute transfer at ' + instance.formatTime(d3.timeOfDay / 3600);//$tim33
+      .attr('cx', function (d4) {																						//$tim33
+	if (Math.round(d4.lengthOfTransfer / 60) > 2) {	//$tim-z
+  	  return xscale(d4.lengthOfTransfer / 60);																		//$tim33x - this is the plot; currently returning NaN
+      }												//$tim-z
+	  })																												//$tim33
+      //}
+	  .append('title')																									//$tim33
+      .text(function (d4) {																								//$tim33
+        return Math.round(d4.lengthOfTransfer3 / 60) + ' minute transfer at ' + instance.formatTime(d4.timeOfDay / 3600);//$tim33x - this is the plot label
       });																												//$tim33
 	 
       // set up the axis
