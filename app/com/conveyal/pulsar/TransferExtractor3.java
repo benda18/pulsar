@@ -50,13 +50,13 @@ public class TransferExtractor3 {
     private final static Logger LOG = Logger.getLogger(TransferExtractor3.class.getName());
     
     /** The minimum transfer time */
-    private static final int minTransferTime3 = 2 * 60;  //$tim 2 is default
+    private static final int minTransferTime3 = -10 * 60;  //$tim 2 is default
     
     /** the maximum transfer time before it is considered not a transfer. 90 minutes of waiting is pretty ridiculous */
     private static final int maxTransferTime3 = 60 * 80;	//$tim 90 is default
     
     /** how fast can we walk, in m/s? This is set slightly less than in OTP because we are using as-the-crow-flies distance */
-    private static final double walkSpeed = 1;
+    private static final double walkSpeed3 = 1;
     
     public final GTFSFeed feed;
     
@@ -66,7 +66,7 @@ public class TransferExtractor3 {
     private Multimap<RouteDirection3, Trip> tripIndex;
     
     /** Map from stop to route directions */
-    private Multimap<Stop, RouteDirection3> routesByStop;
+    private Multimap<Stop, RouteDirection3> routesByStop3;
     
     /**
      * Usage: feed.zip route_id {0|1} out.csv
@@ -101,9 +101,9 @@ public class TransferExtractor3 {
                 continue;
           
             // TODO: quoting
-            outfile3.write(xfer.toRouteDirection.route.route_id + ",");
-            outfile3.write(xfer.toRouteDirection.direction3.toGtfs() + ",");
-            outfile3.write("\"" + t3.getName(xfer.toRouteDirection) + "\",");
+            outfile3.write(xfer.toRouteDirection3.route.route_id + ",");
+            outfile3.write(xfer.toRouteDirection3.direction3.toGtfs() + ",");
+            outfile3.write("\"" + t3.getName(xfer.toRouteDirection3) + "\",");
             outfile3.write("\"" + xfer.fromStop.stop_name + "\",");
             outfile3.write(xfer.min + ",");
             outfile3.write(xfer.pct25 + ",");
@@ -179,7 +179,7 @@ public class TransferExtractor3 {
      * Index route directions by stop.
      */
     private void indexRouteStops () {
-        routesByStop = HashMultimap.create();
+        routesByStop3 = HashMultimap.create();
         
         for (Trip trip : feed.trips.values()) {
             RouteDirection3 routeDir = new RouteDirection3(trip.route, Direction3.fromGtfs(trip.direction_id));	//$tim$ default = trip.direction_id
@@ -187,7 +187,7 @@ public class TransferExtractor3 {
             Collection<StopTime> stopTimes = stopTimesForTrip(trip.trip_id); //$tim trip_id
             
             for (StopTime st : stopTimes) {
-                routesByStop.put(feed.stops.get(st.stop_id), routeDir);
+                routesByStop3.put(feed.stops.get(st.stop_id), routeDir);
             }
         }
     }
@@ -338,7 +338,7 @@ public class TransferExtractor3 {
             
             for (Stop toStop : stopsNear(fromStop.stop_lat, fromStop.stop_lon, threshold)) {
                 // find all possible transfers
-                for (RouteDirection3 rd3 : routesByStop.get(toStop)) {
+                for (RouteDirection3 rd3 : routesByStop3.get(toStop)) {
                     // this can happen when we cross a route that does not have service on the day specified
                     if (!tripIndex.containsKey(rd3))
                         continue;                    
@@ -379,14 +379,14 @@ public class TransferExtractor3 {
                     boolean next = false;
                     
                     for (Transfer3 prevt : transfersByStop.get(stops[sidx - 1])) {  //$tim&& should be (Transfer
-                        if (prevt.toRouteDirection.equals(t3.toRouteDirection)) {
+                        if (prevt.toRouteDirection3.equals(t3.toRouteDirection3)) {
                             previous = true;
                             break;
                         }
                     }
                     
                     for (Transfer3 nextt : transfersByStop.get(stops[sidx - 1])) {  //$tim&& should be (Transfer
-                        if (nextt.toRouteDirection.equals(t3.toRouteDirection)) {
+                        if (nextt.toRouteDirection3.equals(t3.toRouteDirection3)) {
                             next = true;
                             break;
                         }
@@ -408,13 +408,13 @@ public class TransferExtractor3 {
      * which is fine for the the TriMet use case as we use this in conjunction with calendar_extract. but in general this is not
      * desirable.
      */
-    public TransferTime3[] transferTimes(Transfer3 t3) {  //$tim&& should be (Transfer t)
+    public TransferTime3[] transferTimes3(Transfer3 t3) {  //$tim&& should be (Transfer t)  //$tim33
         // we can't just use an array, as not every trip stops at every stop
         // note
         TIntList arrivalTimes = new TIntArrayList(); 
         TIntList departureTimes = new TIntArrayList();
         
-        for (Trip trip : tripIndex.get(t3.fromRouteDirection)) {
+        for (Trip trip : tripIndex.get(t3.fromRouteDirection3)) {
             Iterator<StopTime> stopTimes = stopTimesForTrip(trip.trip_id).iterator();
             
             // doesn't make sense to transfer from the first stop on a trip, advance the iterator one
@@ -435,7 +435,7 @@ public class TransferExtractor3 {
             }
         }
         
-        for (Trip trip : tripIndex.get(t3.toRouteDirection)) {
+        for (Trip trip : tripIndex.get(t3.toRouteDirection3)) {
             Iterator<StopTime> stopTimes = stopTimesForTrip(trip.trip_id).iterator();
             while (stopTimes.hasNext()) {
                 StopTime st = stopTimes.next();
@@ -449,7 +449,7 @@ public class TransferExtractor3 {
         arrivalTimes.sort();
         departureTimes.sort();
         
-        List<TransferTime3> transferTimes = new ArrayList<TransferTime3>();
+        List<TransferTime3> transferTimes3 = new ArrayList<TransferTime3>();  //$tim33
         
         TIntIterator arrivalsIterator = arrivalTimes.iterator();
         TIntIterator departuresIterator = departureTimes.iterator();
@@ -475,7 +475,7 @@ public class TransferExtractor3 {
         ARRIVALS: while (arrivalsIterator.hasNext()) {
             int arrival = arrivalsIterator.next();
             
-            int earliestPossibleDeparture = arrival + minTransferTime3 + (int) Math.round(t3.distance / walkSpeed);
+            int earliestPossibleDeparture = arrival + minTransferTime3 + (int) Math.round(t3.distance / walkSpeed3);
             
             while (departure < earliestPossibleDeparture) {
                 if (!departuresIterator.hasNext())
@@ -485,14 +485,14 @@ public class TransferExtractor3 {
                 departure = departuresIterator.next();
             }
             
-            int transferTime = departure - arrival;
+            int transferTime3 = departure - arrival;
             
-            if (transferTime <= maxTransferTime3)
-                transferTimes.add(new TransferTime3(transferTime, arrival));
+            if (transferTime3 <= maxTransferTime3)
+                transferTimes3.add(new TransferTime3(transferTime3, arrival));
                 
         }
         
-        return transferTimes.toArray(new TransferTime3[transferTimes.size()]);
+        return transferTimes3.toArray(new TransferTime3[transferTimes3.size()]);
     }
     
     /**
@@ -501,7 +501,7 @@ public class TransferExtractor3 {
      * @param toTome the end of the time window to consider, in seconds
      */
     public void addDistributionToTransfer(Transfer3 t3, int fromTime, int toTime) {  //$tim&& should be (Transfer t,
-        TransferTime3[] times = transferTimes(t3);
+        TransferTime3[] times = transferTimes3(t3);
         
         Arrays.sort(times, new TransferTime3.LengthComparator());
         
@@ -509,8 +509,8 @@ public class TransferExtractor3 {
             return;
         
         // min and max are easy
-        t3.min = times[0].lengthOfTransfer;
-        t3.max = times[times.length - 1].lengthOfTransfer;
+        t3.min = times[0].lengthOfTransfer3;
+        t3.max = times[times.length - 1].lengthOfTransfer3;
         
         // get the percentiles
         t3.pct25 = getPercentile(25, times);
@@ -528,15 +528,15 @@ public class TransferExtractor3 {
             return Integer.MAX_VALUE;
         
         if (times.length == 1)
-            return times[0].lengthOfTransfer;
+            return times[0].lengthOfTransfer3;
         
         double offset = (((double) percent) / 100d) * ((double) times.length - 1);
         
         // we compute the percentile as a weighted average of the times above and below the offset
         // if we hit a number exactly, this will still work as we'll be taking the weighted average of the same
         // number
-        int above = times[(int) Math.ceil(offset)].lengthOfTransfer;
-        int below = times[(int) Math.floor(offset)].lengthOfTransfer;
+        int above = times[(int) Math.ceil(offset)].lengthOfTransfer3;
+        int below = times[(int) Math.floor(offset)].lengthOfTransfer3;
         
         double aboveProportion = offset % 1;
         
@@ -595,8 +595,8 @@ public class TransferExtractor3 {
     public static class Transfer3 {  //$tim&& should be Transfer
         public Stop fromStop;
         public Stop toStop;
-        public RouteDirection3 fromRouteDirection;
-        public RouteDirection3 toRouteDirection;
+        public RouteDirection3 fromRouteDirection3;
+        public RouteDirection3 toRouteDirection3;
         
         /** meters, as the crow flies */
         public double distance;
@@ -620,13 +620,13 @@ public class TransferExtractor3 {
         public int n;
         
         /** actual transfer times */
-        public TransferTime3[] transferTimes; 
+        public TransferTime3[] transferTimes3; 
         
-        public Transfer3(Stop fromStop, Stop toStop, RouteDirection3 fromRouteDirection, RouteDirection3 toRouteDirection) {	//$tim&& this is a good source; should be Transfer
+        public Transfer3(Stop fromStop, Stop toStop, RouteDirection3 fromRouteDirection3, RouteDirection3 toRouteDirection3) {	//$tim&& this is a good source; should be Transfer
             this.fromStop = fromStop;
             this.toStop = toStop;
-            this.fromRouteDirection = fromRouteDirection;
-            this.toRouteDirection = toRouteDirection;
+            this.fromRouteDirection3 = fromRouteDirection3;
+            this.toRouteDirection3 = toRouteDirection3;
             this.distance = getDistance(fromStop.stop_lat, fromStop.stop_lon, toStop.stop_lat, toStop.stop_lon);
             
             // make it clear that these have not been initialized.
@@ -638,13 +638,13 @@ public class TransferExtractor3 {
     /** Represents a single instance of a transfer, with the length and the time of day */
     public static class TransferTime3 {
         /** Length of the transfer, seconds */
-        public int lengthOfTransfer;
+        public int lengthOfTransfer3;
         
         /** time of day, seconds since midnight */
         public int timeOfDay;
         
-        public TransferTime3 (int lengthOfTransfer, int timeOfDay) {
-            this.lengthOfTransfer = lengthOfTransfer;
+        public TransferTime3 (int lengthOfTransfer3, int timeOfDay) {
+            this.lengthOfTransfer3 = lengthOfTransfer3;
             this.timeOfDay = timeOfDay;
         }
         
@@ -652,7 +652,7 @@ public class TransferExtractor3 {
         public static class LengthComparator implements Comparator<TransferTime3> {
             @Override
             public int compare(TransferTime3 o1, TransferTime3 o2) {
-                return o1.lengthOfTransfer - o2.lengthOfTransfer;
+                return o1.lengthOfTransfer3 - o2.lengthOfTransfer3;
             }
         }
         
