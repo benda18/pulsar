@@ -42,3 +42,9 @@ trips.txt.  The issue for you as a user of a different feed is that while 0 and 
 here, there is no specification that requires 1 be inbound and 0 outbound - you will need to check your feed and adjust 
 the code as necessary in pulsar.js  Also, a flaw right now is it does not accurately descirbe looping routes or routes
 which are locally referred to by "eastbound vs westbound" etc.  
+
+The code has been modified to display "missed" transfer - i.e. transfers that occurred up to 5 minutes before the origin bus arrived - in red to show "close calls" within the schedule.  While it's of no use for a passenger to know that he or she has just missed a bus it's valuable to service planners to understand where these events are occuring, especially if a trasnfer is missed by just a few minutes and the wait time for the next transfer is large.  
+
+## TO-DO
+
+Confirm that the "just missed transfer" feature works properly and doesn't cause the code to skip the display of the next viable transfer at that stop.  
