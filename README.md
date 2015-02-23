@@ -11,7 +11,7 @@ or poorly.
 
 Installation should be pretty simple. Create a directory `gtfs` in the root directory of the checkout and copy your GTFS
 file into that directory. Call it `baseline.zip`. (This name is hardwired in the code; changing this is planned). Then
-type `./activator run -mem 2048`, adjusting the memory allocation as needed, to start the tool. Load `http://localhost:9000`
+type `./activator run -mem 4096`, adjusting the memory allocation as needed, to start the tool. Load `http://localhost:9000`
 and select a route and a direction to visualize transfer times. You can filter the transfer times by time of day using
 the range slider. Each dot represents a transfer.
 
