@@ -1,6 +1,6 @@
 # pulsar: evaluate connection times by route
 
-<img src="splash.png" alt="visualization of connection times from Route M4, Washington, DC" />
+<img src="splash.png" alt="visualization of connection times" />
 
 Connection times can greatly influence the users' perspective of a transit system. In a low-frequency environment, with
 vehicles running once every half-hour or hour, the time to connect between two vehicles can dominate the total trip time.
