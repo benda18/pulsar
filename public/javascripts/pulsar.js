@@ -92,7 +92,7 @@ window.Pulsar.prototype = {
 
     // 250 is for text
     var xscale = d3.scale.linear()
-      .domain([-10, 80])				//$tim [0, 90] - this scales the entire chart, not just the circles
+      .domain([-5, 85])				//$tim [0, 90] - this scales the entire chart, not just the circles
       .range([400, this.width - 10]);  //$tim - unrelated to threshold distance
 
     var svg = d3.select(".figure")
@@ -145,12 +145,11 @@ window.Pulsar.prototype = {
       });
 
     var offset = -transfers[0][0].getBBox().height / 3;
-	var offset3 = -transfers3[0][0].getBBox().height / 3;	//$tim33
 
     // add a line from each transfer so you can follow it across
     transfers.append('line')
-      .attr('x1', xscale(-10))	//$tim 0
-      .attr('x2', xscale(80))	//$tim 90, this is the horizontal line
+      .attr('x1', xscale(-5))	//$tim 0
+      .attr('x2', xscale(85))	//$tim 90, this is the horizontal line
       .attr('y1', offset)
       .attr('y2', offset)
       .attr('class', 'transfer-line');
@@ -193,33 +192,37 @@ window.Pulsar.prototype = {
     transferMarkers
 	  .attr('cy', offset)
       .attr('cx', function (d) {
-	if (Math.round(d.lengthOfTransfer / 60) <= 2) {	//$tim-z	  
-        return xscale(d.lengthOfTransfer / 60);
-      }												//$tim-z		
+	if (d.lengthOfTransfer / 60 <= 2 && d.lengthOfTransfer / 60 >= -10) {	//$tim-z	  
+        return xscale(d.lengthOfTransfer / 60);								//$tim-z			
+      }	else {	  															//$tim-z		
+	    return xscale(-100);  												//$tim-z		
+		}  																	//$tim-z		
       })
       .append('title')
 	  .text(function (d) {
 	  //if (Math.round(d.lengthOfTransfer / 60) > -3) {													//$tim33x - this is groundbreaking
-        return Math.round(d.lengthOfTransfer / 60) + ' minute transfer at ' + instance.formatTime(d.timeOfDay / 3600);
+        return 'Missed a transfer ' + Math.round(d.lengthOfTransfer / 60) + ' minutes prior at ' + instance.formatTime(d.timeOfDay / 3600);
 	//}																									//$tim33x - this is groundbreaking
       });
 
 	transferMarkers3.enter()																							//$tim33
       .append('circle')																									//$tim33
-      .attr('class', 'transfer-marker3')	//$tim33																					//$tim33 may need to update to transfer3-marker
-      .attr('r', '7');																									//$tim33
+      .attr('class', 'transfer-marker')	//$tim33																					//$tim33 may need to update to transfer3-marker
+      .attr('r', '5');																									//$tim33
 																														//$tim33
     transferMarkers3																									//$tim33
 	  .attr('cy', offset)																								//$tim33
       .attr('cx', function (d4) {																						//$tim33
-	if (Math.round(d4.lengthOfTransfer / 60) > 2) {	//$tim-z
+	if (d4.lengthOfTransfer / 60 > 2 && d4.lengthOfTransfer / 60 != null) {	//$tim-z
   	  return xscale(d4.lengthOfTransfer / 60);																		//$tim33x - this is the plot; currently returning NaN
-      }												//$tim-z
+      }	else {											//$tim-z
+	    return xscale(-100);
+	  }
 	  })																												//$tim33
-      //}
+      
 	  .append('title')																									//$tim33
       .text(function (d4) {																								//$tim33
-        return Math.round(d4.lengthOfTransfer3 / 60) + ' minute transfer at ' + instance.formatTime(d4.timeOfDay / 3600);//$tim33x - this is the plot label
+        return Math.round(d4.lengthOfTransfer / 60) + ' minute transfer at ' + instance.formatTime(d4.timeOfDay / 3600);//$tim33x - this is the plot label
       });																												//$tim33
 	 
       // set up the axis
