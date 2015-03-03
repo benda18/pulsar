@@ -1,4 +1,4 @@
-package com.conveyal.pulsar;
+/*package com.conveyal.pulsar;
 
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
@@ -45,33 +45,34 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  * Extract data from a GTFS feed about transfer performance.
  * @author mattwigway
  *
- */
+ */ 
+ /*
 public class TransferExtractor3 {
     private final static Logger LOG = Logger.getLogger(TransferExtractor3.class.getName());
     
-    /** The minimum transfer time */
-    private static final int minTransferTime3 = -5 * 60;  //$tim 2 is default
+    /** The minimum transfer time */ /*
+    private static final int minTransferTime3 = -33 * 60;  //$tim 2 is default
     
-    /** the maximum transfer time before it is considered not a transfer. 90 minutes of waiting is pretty ridiculous */
-    private static final int maxTransferTime3 = 60 * 85;	//$tim 90 is default
+    /** the maximum transfer time before it is considered not a transfer. 90 minutes of waiting is pretty ridiculous */ /*
+    private static final int maxTransferTime3 = 60 * -22;	//$tim 90 is default
     
-    /** how fast can we walk, in m/s? This is set slightly less than in OTP because we are using as-the-crow-flies distance */
+    /** how fast can we walk, in m/s? This is set slightly less than in OTP because we are using as-the-crow-flies distance */ /*
     private static final double walkSpeed3 = 1;
     
     public final GTFSFeed feed;
     
     private STRtree stopsIndex;
     
-    /** Map from route direction to trip IDs */
+    /** Map from route direction to trip IDs */ /*
     private Multimap<RouteDirection3, Trip> tripIndex;
     
-    /** Map from stop to route directions */
+    /** Map from stop to route directions */ /* 
     private Multimap<Stop, RouteDirection3> routesByStop3;
     
     /**
      * Usage: feed.zip route_id {0|1} out.csv
      * @param args
-     */
+     */ /*
     public static void main (String... args) throws Exception {
         GTFSFeed feed = GTFSFeed.fromFile(args[0]);
         LOG.info("feed loaded");
@@ -88,7 +89,7 @@ public class TransferExtractor3 {
         OutputStream os = new FileOutputStream(new File(args[3]));
         Writer outfile3 = new PrintWriter(os);
         
-        outfile3.write("route_id,direction_id,destination,at,min,percentile_25,median,percentile_75,max,count\n");
+        outfile3.write("route_id,direction_id,destination,at,min,percentile_25,median,percentile_75,max,count\n");	
         
         for (Transfer3 xfer : transfers3) {	//$tim&& should be (Transfer
             if (++i % 50 == 0)
@@ -101,7 +102,7 @@ public class TransferExtractor3 {
                 continue;
           
             // TODO: quoting
-            outfile3.write(xfer.toRouteDirection3.route.route_id + ",");
+            outfile3.write(xfer.toRouteDirection3.route.route_id + ",");		
             outfile3.write(xfer.toRouteDirection3.direction3.toGtfs() + ",");
             outfile3.write("\"" + t3.getName(xfer.toRouteDirection3) + "\",");
             outfile3.write("\"" + xfer.fromStop.stop_name + "\",");
@@ -121,7 +122,7 @@ public class TransferExtractor3 {
     
     /**
      * Create a new transfer extractor for the given GTFS file.
-     */
+     */ /*
     public TransferExtractor3(File feed) {
         this(GTFSFeed.fromFile(feed.getAbsolutePath()));
     }
@@ -129,7 +130,7 @@ public class TransferExtractor3 {
     /**
      * Create a new transfer extractor for the given GTFS feed. Assumes the feed has already been loaded.
      * @param feed
-     */
+     */ /*
     public TransferExtractor3(GTFSFeed feed) {
         this.feed = feed;
         
@@ -144,7 +145,7 @@ public class TransferExtractor3 {
     
     /**
      * Index stops geographically, so that we can quickly find which routes cross other routes.
-     */
+     */ /*
     private void indexStops () {
         // create a spatial index for stops
         stopsIndex = new STRtree(feed.stops.size());
@@ -157,7 +158,7 @@ public class TransferExtractor3 {
     
     /**
      * Index trips by route ID and direction, so that we can find them easily. 
-     */
+     */ /*
     private void indexTrips (DateTime date) {
         tripIndex = HashMultimap.create();
         
@@ -177,7 +178,7 @@ public class TransferExtractor3 {
     
     /**
      * Index route directions by stop.
-     */
+     */ /*
     private void indexRouteStops () {
         routesByStop3 = HashMultimap.create();
         
@@ -196,7 +197,7 @@ public class TransferExtractor3 {
         return stopsForRouteDirection(new RouteDirection3(route, direction3));
     }
     
-    /** Get a human readable name for a route direction in this feed */
+    /** Get a human readable name for a route direction in this feed */ /*
     public String getName (RouteDirection3 dir3) {
         Trip exemplar = tripIndex.get(dir3).iterator().next();
         Collection<StopTime> stopTimes = stopTimesForTrip(exemplar.trip_id);
@@ -211,7 +212,7 @@ public class TransferExtractor3 {
     /**
      * Get the stops for a direction of a route, more or less in order.
      * "More or less" because a direction of a route may not always visit exactly the same stops in the same order.
-     */
+     */ /*
     public Stop[] stopsForRouteDirection(RouteDirection3 routeDirection) {
         Set<Stop> stops = new HashSet<Stop>();
         ArrayList<Stop> stopsInOrder = new ArrayList<Stop>();
@@ -247,8 +248,10 @@ public class TransferExtractor3 {
                 
                 // slot the stop in after the previous stop
                 if (i > 0) {
-                    Stop prev = feed.stops.get(stopTimes[i - 1].stop_id);
-                    if (stops.contains(prev)) {
+                    //int mss3 = 8001;	//$tim55
+					Stop prev = feed.stops.get(stopTimes[i - 1].stop_id);
+                    if (stops.contains(prev)) { //$tim55
+                    //if (stops.contains(mss3)) { 	//$tim55
                         stopsInOrder.add(stopsInOrder.indexOf(prev) + 1, stop);
                         stops.add(stop);
                         continue;
@@ -283,7 +286,7 @@ public class TransferExtractor3 {
         return feed.stop_times.subMap(new Tuple2(trip_id, null), new Tuple2(trip_id, Fun.HI)).values();
     }
 
-    /** get the geodetic distance between two points */
+    /** get the geodetic distance between two points */ /*
     public static final double getDistance(double lat0, double lon0, double lat1, double lon1) {
         // this is a needlessly verbose API and is also not thread safe
         GeodeticCalculator gc = new GeodeticCalculator();
@@ -292,7 +295,7 @@ public class TransferExtractor3 {
         return gc.getOrthodromicDistance();
     }
     
-    /** get stops within threshold meters of the point */
+    /** get stops within threshold meters of the point */ /*
     public Collection<Stop> stopsNear(final double lat, final double lon, final double threshold) {
         // convert the threshold to decimal degrees of latitude, which is easy
         // by definition, 10 000 000 m from equator to pole (it's actually more like 10 000 002, but who's counting?)
@@ -321,7 +324,7 @@ public class TransferExtractor3 {
     /**
      * Get the optimal transfers for a route direction, in order from their transfer stops.
      * @param threshold maximum transfer distance, meters as the crow flies.
-     */
+     */ /*
     public Transfer3[] getTransfers(RouteDirection3 dir3, double threshold) {  //$tim&& should be Transfer[]
         
         // get all of the stops for the route direction
@@ -407,7 +410,7 @@ public class TransferExtractor3 {
      * TODO: constrain to specific day; currently this is looking at all the service in the feed as if it were a single day,
      * which is fine for the the TriMet use case as we use this in conjunction with calendar_extract. but in general this is not
      * desirable.
-     */
+     */ /*
     public TransferTime3[] transferTimes3(Transfer3 t3) {  //$tim&& should be (Transfer t)  //$tim33
         // we can't just use an array, as not every trip stops at every stop
         // note
@@ -499,7 +502,7 @@ public class TransferExtractor3 {
      * Calculate the distribution of transfer time statistics and add it to a transfer object.
      * @param fromTime the beginning of the time window to consider, in seconds
      * @param toTome the end of the time window to consider, in seconds
-     */
+     */ /*
     public void addDistributionToTransfer(Transfer3 t3, int fromTime, int toTime) {  //$tim&& should be (Transfer t,
         TransferTime3[] times = transferTimes3(t3);
         
@@ -521,7 +524,7 @@ public class TransferExtractor3 {
     }
     
     
-    /** Get a given percentile from a sorted list of times */
+    /** Get a given percentile from a sorted list of times */ /*
     private int getPercentile(int percent, TransferTime3[] times) {
         if (times.length == 0)
             // by construction
@@ -548,11 +551,11 @@ public class TransferExtractor3 {
      * (inbound? outbound? north? uphill? clockwise?). We just assume that there are two directions
      * that are distinct to the user. If available, we use the GTFS direction ID flag to define directions.
      * Otherwise, we infer them.
-     */
+     */ /*
     public static enum Direction3 {
         DIR_0, DIR_1;
         
-        /** get a direction from a GTFS direction ID */
+        /** get a direction from a GTFS direction ID */ /*
         public static Direction3 fromGtfs(int gtfsDirection) {
             return gtfsDirection == 0 ? DIR_0 : DIR_1;
         }
@@ -583,7 +586,7 @@ public class TransferExtractor3 {
         }
         
         public int hashCode () {
-            return route.route_id.hashCode() + direction3.ordinal();
+            return route.route_id.hashCode() + direction3.ordinal();		
         }
     }
     
@@ -591,35 +594,35 @@ public class TransferExtractor3 {
      * Represents a transfer from a route direction to another route direction.
      * @author mattwigway
      *
-     */
+     */ /*
     public static class Transfer3 {  //$tim&& should be Transfer
         public Stop fromStop;
         public Stop toStop;
         public RouteDirection3 fromRouteDirection3;
         public RouteDirection3 toRouteDirection3;
         
-        /** meters, as the crow flies */
+        /** meters, as the crow flies */ /*
         public double distance;
         
-        /** minimum transfer time, seconds */
+        /** minimum transfer time, seconds */ /*
         public int min;
         
-        /** 25th percentile transfer time, seconds */
+        /** 25th percentile transfer time, seconds */ /*
         public int pct25;
         
-        /** median transfer time, seconds */
+        /** median transfer time, seconds */ /*
         public int median;
         
-        /** 75th percentile transfer time, seconds */
+        /** 75th percentile transfer time, seconds */ /*
         public int pct75;
         
-        /** maximum transfer time, seconds */
+        /** maximum transfer time, seconds */ /*
         public int max;
         
-        /** number of transfers */
+        /** number of transfers */ /*
         public int n;
         
-        /** actual transfer times */
+        /** actual transfer times */ /*
         public TransferTime3[] transferTimes3; 
         
         public Transfer3(Stop fromStop, Stop toStop, RouteDirection3 fromRouteDirection3, RouteDirection3 toRouteDirection3) {	//$tim&& this is a good source; should be Transfer
@@ -635,12 +638,12 @@ public class TransferExtractor3 {
     }
 
     
-    /** Represents a single instance of a transfer, with the length and the time of day */
+    /** Represents a single instance of a transfer, with the length and the time of day */ /*
     public static class TransferTime3 {
-        /** Length of the transfer, seconds */
+        /** Length of the transfer, seconds */ /*
         public int lengthOfTransfer3;
         
-        /** time of day, seconds since midnight */
+        /** time of day, seconds since midnight */ /*
         public int timeOfDay;
         
         public TransferTime3 (int lengthOfTransfer3, int timeOfDay) {
@@ -648,7 +651,7 @@ public class TransferExtractor3 {
             this.timeOfDay = timeOfDay;
         }
         
-        /** compare based on the length of the transfer */
+        /** compare based on the length of the transfer */ /*
         public static class LengthComparator implements Comparator<TransferTime3> {
             @Override
             public int compare(TransferTime3 o1, TransferTime3 o2) {
@@ -656,7 +659,7 @@ public class TransferExtractor3 {
             }
         }
         
-        /** compare based on the time of day */
+        /** compare based on the time of day */ /*
         public static class TimeOfDayComparator implements Comparator<TransferTime3> {
             @Override
             public int compare(TransferTime3 o1, TransferTime3 o2) {
@@ -665,4 +668,4 @@ public class TransferExtractor3 {
         }
     }
 }
-
+ */
