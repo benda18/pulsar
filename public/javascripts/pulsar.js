@@ -38,7 +38,7 @@ window.Pulsar.prototype = {
     var mins = Math.round((time - hrs) * 60);
 
     mins = mins < 10 ? '0' + mins : mins;
-    /* //comment out this section to move from 12 hour to 24 hour clock	
+    /* //comment out this section to move to 24 hour time	
     var ap = hrs >= 12 ? ' pm' : ' am';
     if (hrs == 24) ap = ' am';
 
@@ -46,7 +46,7 @@ window.Pulsar.prototype = {
 
     if (hrs === 0) hrs = 12;
     return hrs + ":" + mins + ap;*/
-    return hrs + ":" + mins;	//new line to remove AM/PM suffix
+    return hrs + ":" + mins;	//new line to remove AM/PM suffix			
   },
 
   /** get a name for a routedirection */
@@ -54,7 +54,7 @@ window.Pulsar.prototype = {
     var name = rd.route.route_short_name !== null ?
     rd.route.route_short_name :
     rd.route.route_long_name;
-    return name + " -- " + rd.destination;    //$tim I'm reducing the number of times 'to' is used to minimize confusion between
+    return name + " -- " + rd.destination;    //I'm reducing the number of times 'to' is used to minimize confusion between
                                               //identifying the direction of travel and the destination name of a route. 
   },
 
@@ -82,7 +82,7 @@ window.Pulsar.prototype = {
 	  }
     
     // set the title
-    d3.select("#title").text("Transfers from #" + this.route + " - " + ibob + " to...");  //simplifies how data is displayed. 
+    d3.select("#title").text("Transfers from #" + this.route + " - " + ibob + " to...");  //simplifies how data is displayed. 	//$tim66
 
     // draw the new plot
     // figure the spacing
@@ -93,8 +93,8 @@ window.Pulsar.prototype = {
 
     // 250 is for text
     var xscale = d3.scale.linear()
-      .domain([-5, 85])				//$tim [0, 90] - this scales the entire chart, not just the circles
-      .range([400, this.width - 10]);  //$tim - unrelated to threshold distance
+      .domain([-5, 85])				//default [0, 90] - this scales the entire chart, not just the circles
+      .range([400, this.width - 10]);  //note - unrelated to threshold distance
 
     var svg = d3.select(".figure")
       .append('svg')
@@ -103,7 +103,7 @@ window.Pulsar.prototype = {
       .append('g');
 
     // append each transfer
-    var transfers = svg.selectAll('g.transfer2')	//$tim changing this does nothing
+    var transfers = svg.selectAll('g.transfer2')	
       .data(this.data);
 	  
 	var transfers3 = svg.selectAll('g.transfer3')		//$tim33
@@ -112,7 +112,7 @@ window.Pulsar.prototype = {
     transfers		//$tim this is the actual transfer svg plot ##########################
       .enter()
       .append('g')
-      .attr('class', 'transfer2')	//$tim&& if i change this to 'transfer99' only the colour of plots changes and lines disappear
+      .attr('class', 'transfer2')	
       .attr('transform', function (d, i) {
         return 'translate(0 ' + yscale(i + 1) + ')';
       });
@@ -121,7 +121,7 @@ window.Pulsar.prototype = {
       .enter()											//$tim33
       .append('g')										//$tim33
       .attr('class', 'transfer3')						//$tim33
-      .attr('transform', function (d4, i) {				//$tim33x - should not be d3
+      .attr('transform', function (d4, i) {				//$tim33
         return 'translate(0 ' + yscale(i + 1) + ')';	//$tim33
       });												//$tim33
 	  
@@ -149,8 +149,8 @@ window.Pulsar.prototype = {
 
     // add a line from each transfer so you can follow it across
     transfers.append('line')
-      .attr('x1', xscale(-5))	//$tim 0
-      .attr('x2', xscale(85))	//$tim 90, this is the horizontal line
+      .attr('x1', xscale(-5))	//default 0
+      .attr('x2', xscale(85))	//default 90, this is the horizontal line
       .attr('y1', offset)
       .attr('y2', offset)
       .attr('class', 'transfer-line');
@@ -175,7 +175,7 @@ window.Pulsar.prototype = {
         // TODO: filter here																			//$tim33
         var filtered = [];																				//$tim33
 																										//$tim33
-        d4.transferTimes.forEach(function (tt3) {														//$tim33 - something wrong here  d3.transferTimes3.
+        d4.transferTimes.forEach(function (tt3) {														//$tim33
           if (tt3.timeOfDay >= instance.range[0] * 3600 && tt3.timeOfDay <= instance.range[1] * 3600) {	//$tim33
             filtered.push(tt3);																			//$tim33
           }																								//$tim33
@@ -188,7 +188,7 @@ window.Pulsar.prototype = {
     transferMarkers.enter()
       .append('circle')
       .attr('class', 'transfer-marker')
-      .attr('r', '5');		//$tim - control radius of the circle marker.
+      .attr('r', '3');		//$tim - control radius of the circle marker.
 
     transferMarkers
 	  .attr('cy', offset)
@@ -208,24 +208,25 @@ window.Pulsar.prototype = {
 
 	transferMarkers3.enter()																							//$tim33
       .append('circle')																									//$tim33
-      .attr('class', 'transfer-marker')	//$tim33																					//$tim33 may need to update to transfer3-marker
-      .attr('r', '5');																									//$tim33
-																														//$tim33
+      .attr('class', 'transfer-marker')	//$tim33																		//$tim33
+      .attr('r', '3');																									//$tim33
+																													
     transferMarkers3																									//$tim33
 	  .attr('cy', offset)																								//$tim33
       .attr('cx', function (d4) {																						//$tim33
 	if (d4.lengthOfTransfer / 60 > 2 && d4.lengthOfTransfer / 60 != null) {	//$tim-z
-  	  return xscale(d4.lengthOfTransfer / 60);																		//$tim33x - this is the plot; currently returning NaN
-      }	else {											//$tim-z
+  	  return xscale(d4.lengthOfTransfer / 60);																			//$tim33
+      }	else {																											//$tim-z
 	    return xscale(-100);
 	  }
+
 	  })																												//$tim33
-      
+
 	  .append('title')																									//$tim33
       .text(function (d4) {																								//$tim33
         return Math.round(d4.lengthOfTransfer / 60) + ' minute transfer at ' + instance.formatTime(d4.timeOfDay / 3600);//$tim33x - this is the plot label
       });																												//$tim33
-	 
+	  
       // set up the axis
       var axis = d3.svg.axis()
         .scale(xscale)
@@ -243,4 +244,5 @@ window.Pulsar.prototype = {
         .append('text')
         .text('Transfer length (minutes)');
   }
+ 
 };
