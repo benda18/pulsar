@@ -3,7 +3,8 @@ window.Pulsar = function (file) {
   this.file = file;
   this.height = 800;
   this.width = 1200;
-  this.range = [0, 24];
+  //this.range = [0, 24]; 	//changed to be compatible with 0300 - 2700 transit day
+  this.range = [3, 27]; 	//changed to be compatible with 0300 - 2700 transit day
 };
 
 window.Pulsar.prototype = {
