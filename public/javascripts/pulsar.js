@@ -37,15 +37,15 @@ window.Pulsar.prototype = {
     var mins = Math.round((time - hrs) * 60);
 
     mins = mins < 10 ? '0' + mins : mins;
-
+    /* //comment out this section to move from 12 hour to 24 hour clock	
     var ap = hrs >= 12 ? ' pm' : ' am';
     if (hrs == 24) ap = ' am';
 
     hrs = hrs % 12;
 
     if (hrs === 0) hrs = 12;
-
-    return hrs + ":" + mins + ap;
+    return hrs + ":" + mins + ap;*/
+    return hrs + ":" + mins;	//new line to remove AM/PM suffix
   },
 
   /** get a name for a routedirection */
