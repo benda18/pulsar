@@ -88,7 +88,7 @@ public class TransferExtractor {
         OutputStream os = new FileOutputStream(new File(args[3]));
         Writer outfile = new PrintWriter(os);
         
-        outfile.write("route_id,direction_id,destination,at,min,percentile_25,median,percentile_75,max,count\n");
+        outfile.write("route_id,direction_id,destination,at,min,percentile_25,median,percentile_75,max,count\n");		
         
         for (Transfer2 xfer : transfers) {	//$tim&& should be (Transfer
             if (++i % 50 == 0)
@@ -101,7 +101,7 @@ public class TransferExtractor {
                 continue;
           
             // TODO: quoting
-            outfile.write(xfer.toRouteDirection.route.route_id + ",");
+            outfile.write(xfer.toRouteDirection.route.route_id + ",");	
             outfile.write(xfer.toRouteDirection.direction.toGtfs() + ",");
             outfile.write("\"" + t2.getName(xfer.toRouteDirection) + "\",");
             outfile.write("\"" + xfer.fromStop.stop_name + "\",");
@@ -204,9 +204,8 @@ public class TransferExtractor {
         for (StopTime st : stopTimes) {
             lastStopId = st.stop_id;
         }
-        
         return feed.stops.get(lastStopId).stop_name;
-    }
+	}
     
     /**
      * Get the stops for a direction of a route, more or less in order.
@@ -247,8 +246,8 @@ public class TransferExtractor {
                 
                 // slot the stop in after the previous stop
                 if (i > 0) {
-                    Stop prev = feed.stops.get(stopTimes[i - 1].stop_id);
-                    if (stops.contains(prev)) {
+					Stop prev = feed.stops.get(stopTimes[i - 1].stop_id);
+                    if (stops.contains(prev)) { 
                         stopsInOrder.add(stopsInOrder.indexOf(prev) + 1, stop);
                         stops.add(stop);
                         continue;
@@ -322,19 +321,19 @@ public class TransferExtractor {
      * Get the optimal transfers for a route direction, in order from their transfer stops.
      * @param threshold maximum transfer distance, meters as the crow flies.
      */
-    public Transfer2[] getTransfers(RouteDirection dir, double threshold) {  //$tim&& should be Transfer[]
+    public Transfer2[] getTransfers(RouteDirection dir, double threshold) {  
         
         // get all of the stops for the route direction
         Stop[] stops = stopsForRouteDirection(dir);
         
-        ArrayList<Transfer2> transfers = new ArrayList<Transfer2>();  //$tim&& should be <Transfer> <Transfer>
-        Multimap<Stop, Transfer2> transfersByStop = HashMultimap.create();  //$tim&& should be Transfer>
+        ArrayList<Transfer2> transfers = new ArrayList<Transfer2>();  		
+        Multimap<Stop, Transfer2> transfersByStop = HashMultimap.create();  
         
         int i = 0;
         for (Stop fromStop : stops) {
             // loop over stops near this stop
             // TODO: don't hardwire threshold to 100m
-            Map<RouteDirection, Transfer2> bestTransfersForThisStop = new HashMap<RouteDirection, Transfer2>(); //$tim&& should be Transfer> Transfer>
+            Map<RouteDirection, Transfer2> bestTransfersForThisStop = new HashMap<RouteDirection, Transfer2>(); 
             
             for (Stop toStop : stopsNear(fromStop.stop_lat, fromStop.stop_lon, threshold)) {
                 // find all possible transfers
@@ -347,7 +346,7 @@ public class TransferExtractor {
                     if (rd.route.equals(dir.route))
                         continue;
                     
-                    Transfer2 t2 = new Transfer2(fromStop, toStop, dir, rd); //$tim&& should be Transfer t, Transfer(
+                    Transfer2 t2 = new Transfer2(fromStop, toStop, dir, rd); 
                     
                     // find one best transfer to every other route direction
                     if (bestTransfersForThisStop.containsKey(rd) && bestTransfersForThisStop.get(rd).distance < t2.distance)
@@ -358,7 +357,7 @@ public class TransferExtractor {
             }
             
             // add the best transfers to the indices
-            for (Transfer2 t2 : bestTransfersForThisStop.values()) {  //$tim&& should be (Transfer t
+            for (Transfer2 t2 : bestTransfersForThisStop.values()) {  
                 transfers.add(t2);
                 transfersByStop.put(fromStop, t2);
             }
@@ -368,24 +367,24 @@ public class TransferExtractor {
         
         // filter the transfers so that when there is a common trunk, we only have the first and last transfers
         for (int sidx = 1; sidx < stops.length - 1; sidx++) {
-            Set<Transfer2> transfersToRemove = new HashSet<Transfer2>();  //$tim&& should be <Transfer> <Transfer>
+            Set<Transfer2> transfersToRemove = new HashSet<Transfer2>();  
             
             // we are in a block of continuous transfers
             if (transfersByStop.containsKey(stops[sidx]) &
                     transfersByStop.containsKey(stops[sidx - 1]) &&
                     transfersByStop.containsKey(stops[sidx + 1])) {
-                for (Transfer2 t2 : transfersByStop.get(stops[sidx])) {  //$tim&& should be (Transfer t
+                for (Transfer2 t2 : transfersByStop.get(stops[sidx])) {  
                     boolean previous = false;
                     boolean next = false;
                     
-                    for (Transfer2 prevt : transfersByStop.get(stops[sidx - 1])) {  //$tim&& should be (Transfer
+                    for (Transfer2 prevt : transfersByStop.get(stops[sidx - 1])) {  
                         if (prevt.toRouteDirection.equals(t2.toRouteDirection)) {
                             previous = true;
                             break;
                         }
                     }
                     
-                    for (Transfer2 nextt : transfersByStop.get(stops[sidx - 1])) {  //$tim&& should be (Transfer
+                    for (Transfer2 nextt : transfersByStop.get(stops[sidx - 1])) {  
                         if (nextt.toRouteDirection.equals(t2.toRouteDirection)) {
                             next = true;
                             break;
@@ -399,7 +398,7 @@ public class TransferExtractor {
             transfers.removeAll(transfersToRemove);
         }        
         
-        return transfers.toArray(new Transfer2[transfers.size()]);  //$tim&& should be Transfer[
+        return transfers.toArray(new Transfer2[transfers.size()]);  
     }
     
     /**
@@ -408,12 +407,12 @@ public class TransferExtractor {
      * which is fine for the the TriMet use case as we use this in conjunction with calendar_extract. but in general this is not
      * desirable.
      */
-    public TransferTime[] transferTimes(Transfer2 t2) {  //$tim&& should be (Transfer t)
+    public TransferTime[] transferTimes(Transfer2 t2) {  
         // we can't just use an array, as not every trip stops at every stop
         // note
         TIntList arrivalTimes = new TIntArrayList(); 
         TIntList departureTimes = new TIntArrayList();
-        
+		        
         for (Trip trip : tripIndex.get(t2.fromRouteDirection)) {
             Iterator<StopTime> stopTimes = stopTimesForTrip(trip.trip_id).iterator();
             
@@ -429,7 +428,7 @@ public class TransferExtractor {
             
             while (stopTimes.hasNext()) {
                 StopTime st = stopTimes.next();
-                if (st.stop_id.equals(t2.fromStop.stop_id)) {
+				if (st.stop_id.equals(t2.fromStop.stop_id)) {
                     arrivalTimes.add(st.arrival_time);
                 }
             }
@@ -500,7 +499,7 @@ public class TransferExtractor {
      * @param fromTime the beginning of the time window to consider, in seconds
      * @param toTome the end of the time window to consider, in seconds
      */
-    public void addDistributionToTransfer(Transfer2 t2, int fromTime, int toTime) {  //$tim&& should be (Transfer t,
+    public void addDistributionToTransfer(Transfer2 t2, int fromTime, int toTime) {  
         TransferTime[] times = transferTimes(t2);
         
         Arrays.sort(times, new TransferTime.LengthComparator());
@@ -592,7 +591,7 @@ public class TransferExtractor {
      * @author mattwigway
      *
      */
-    public static class Transfer2 {  //$tim&& should be Transfer
+    public static class Transfer2 {  
         public Stop fromStop;
         public Stop toStop;
         public RouteDirection fromRouteDirection;
